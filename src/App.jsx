@@ -1,15 +1,14 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-import { RiDeleteBin6Line } from "react-icons/ri"
-import { AiOutlineCheckSquare } from "react-icons/ai"
-import { BiSolidEdit } from "react-icons/bi"
-
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { AiOutlineCheckSquare } from "react-icons/ai";
+import { BiSolidEdit } from "react-icons/bi";
 
 function App() {
   const [isCompleateScreen, setIsCompleateScreen] = useState(false);
   const [todos, setTodos] = useState([]);
-  const [addShow, setAddShow] = useState(true)
-  const[editIndex,setEditIndex]=useState(null)
+  const [addShow, setAddShow] = useState(true);
+  const [editIndex, setEditIndex] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [completedTodos, setCompletedTodos] = useState([]);
@@ -17,43 +16,54 @@ function App() {
   const handleAddTodo = () => {
     let newTodo = {
       title: newTitle,
-      description: newDescription
+      description: newDescription,
+    };
+    if (!newTodo.title && !newTodo.description)
+      return alert("Fields cannot be empty");
+
+    if (
+      todos.some(
+        (todo) =>
+          todo.title === newTodo.title &&
+          todo.description === newTodo.description
+      )
+    ) {
+      alert("This todo already exists in the list.");
+      return;
     }
-    if (!newTodo) return alert('Fields cannot be empty')
     let updateTodoArr = [...todos];
     updateTodoArr.push(newTodo);
     setTodos(updateTodoArr);
-    localStorage.setItem("todolist", JSON.stringify(updateTodoArr))
+    localStorage.setItem("todolist", JSON.stringify(updateTodoArr));
     setNewTitle("");
     setNewDescription("");
     // setTodos([newTodo,...todos]);
   };
 
   const handleEdit = (index) => {
-    let editTodo=todos[index];
-    setEditIndex(index)
-    setNewTitle(editTodo.title)
-    setNewDescription(editTodo.description)
-    setAddShow(false)
-  }
+    let editTodo = todos[index];
+    setEditIndex(index);
+    setNewTitle(editTodo.title);
+    setNewDescription(editTodo.description);
+    setAddShow(false);
+  };
   const handleEditSubmit = () => {
-    todos[editIndex]={title:newTitle,description:newDescription}
+    todos[editIndex] = { title: newTitle, description: newDescription };
     localStorage.removeItem("todolist");
     const newTodoList = [...todos];
-    localStorage.setItem("todolist", JSON.stringify(newTodoList))
+    localStorage.setItem("todolist", JSON.stringify(newTodoList));
     setNewTitle("");
     setNewDescription("");
-    setAddShow(true)
-  }
+    setAddShow(true);
+  };
 
   const handleDeleteTodo = (index) => {
     let reducedTodo = [...todos];
-    reducedTodo.splice(index,1);
-    localStorage.setItem('todolist', JSON.stringify(reducedTodo));
+    reducedTodo.splice(index, 1);
+    localStorage.setItem("todolist", JSON.stringify(reducedTodo));
     setNewTitle("");
     setNewDescription("");
     setTodos(reducedTodo);
-
   };
   console.log(todos);
 
@@ -65,36 +75,37 @@ function App() {
     let h = now.getHours();
     let m = now.getMinutes();
     let s = now.getSeconds();
-    let completedOn = day + '-' + mm + '-' + yyyy + 'at' + h + ':' + m + ':' + s;
+    let completedOn =
+      day + "-" + mm + "-" + yyyy + "at" + h + ":" + m + ":" + s;
     let filteredItem = {
       ...todos[index],
-      completedOn: completedOn
-    }
-    
+      completedOn: completedOn,
+    };
+
     let updateCompletedArr = [...completedTodos];
     updateCompletedArr.push(filteredItem);
     setCompletedTodos(updateCompletedArr);
     handleDeleteTodo(index);
-    localStorage.setItem("completedTodos", JSON.stringify(updateCompletedArr))
-  }
+    localStorage.setItem("completedTodos", JSON.stringify(updateCompletedArr));
+  };
 
   const handleDeleteCompletedTodo = (index) => {
     let reducedTodo = [...completedTodos];
-    reducedTodo.splice(index,1);
-    localStorage.setItem('completedTodos', JSON.stringify(reducedTodo));
+    reducedTodo.splice(index, 1);
+    localStorage.setItem("completedTodos", JSON.stringify(reducedTodo));
     setCompletedTodos(reducedTodo);
   };
 
   useEffect(() => {
-    let savedTodo = JSON.parse(localStorage.getItem('todolist'))
-    let savedCompleted = JSON.parse(localStorage.getItem('completedTodos'))
+    let savedTodo = JSON.parse(localStorage.getItem("todolist"));
+    let savedCompleted = JSON.parse(localStorage.getItem("completedTodos"));
     if (savedTodo) {
       setTodos(savedTodo);
     }
     if (savedCompleted) {
       setCompletedTodos(savedCompleted);
     }
-  }, [])
+  }, []);
 
   return (
     <div className="App">
@@ -102,25 +113,48 @@ function App() {
       <div className="todo-wrapper">
         <div className="todo-input">
           <div className="todo-input-item">
-
             <label>Title</label>
-            <input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Task title" />
-
+            <input
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Task title"
+            />
           </div>
           <div className="todo-input-item">
-
             <label>Description</label>
-            <input type="text" value={newDescription} onChange={(e) => setNewDescription(e.target.value)} placeholder="Task description" />
-
+            <input
+              type="text"
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              placeholder="Task description"
+            />
           </div>
           <div className="todo-input-item">
-            {addShow ? <button type="button" onClick={handleAddTodo} className="primaryBtn">Add</button> : <button type="button" onClick={handleEditSubmit} className="primaryBtn">Edit</button>}
-
+            {addShow ? (
+              <button
+                type="button"
+                onClick={handleAddTodo}
+                className="primaryBtn"
+              >
+                Add
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleEditSubmit}
+                className="primaryBtn"
+              >
+                Edit
+              </button>
+            )}
           </div>
         </div>
         <div className="btn-area">
           <button
-            className={`secondaryBtn ${isCompleateScreen === false && "active"}`}
+            className={`secondaryBtn ${
+              isCompleateScreen === false && "active"
+            }`}
             onClick={() => setIsCompleateScreen(false)}
           >
             Todo
@@ -133,39 +167,53 @@ function App() {
           </button>
         </div>
         <div className="todo-list">
-          {isCompleateScreen === false && todos.map((item, index) => {
-            return (
-              <div className="todo-list-item" key={index}>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
+          {isCompleateScreen === false &&
+            todos.map((item, index) => {
+              return (
+                <div className="todo-list-item" key={index}>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </div>
+                  <div>
+                    <AiOutlineCheckSquare
+                      className="check-icon"
+                      onClick={() => handleComplete(index)}
+                    />
+                    <BiSolidEdit
+                      className="edit-icon"
+                      onClick={() => handleEdit(index)}
+                    />
+                    <RiDeleteBin6Line
+                      className="icon"
+                      onClick={() => handleDeleteTodo(index)}
+                      title="Delete"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <AiOutlineCheckSquare className="check-icon" onClick={() => handleComplete(index)} />
-                  <BiSolidEdit className="edit-icon" onClick={() => handleEdit(index)} />
-                  <RiDeleteBin6Line className="icon" onClick={() => handleDeleteTodo(index)} title="Delete" />
-
-
+              );
+            })}
+          {isCompleateScreen === true &&
+            completedTodos.map((item, index) => {
+              return (
+                <div className="todo-list-item" key={index}>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <p>
+                      <i>Completed on:{item.completedOn}</i>
+                    </p>
+                  </div>
+                  <div>
+                    <RiDeleteBin6Line
+                      className="icon"
+                      onClick={() => handleDeleteCompletedTodo(index)}
+                      title="Delete"
+                    />
+                  </div>
                 </div>
-              </div>
-            )
-          })}
-          {isCompleateScreen === true && completedTodos.map((item, index) => {
-            return (
-              <div className="todo-list-item" key={index}>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                  <p><i>Completed on:{item.completedOn}</i></p>
-                </div>
-                <div>
-
-                  <RiDeleteBin6Line className="icon" onClick={() => handleDeleteCompletedTodo(index)} title="Delete" />
-
-                </div>
-              </div>
-            )
-          })}
+              );
+            })}
         </div>
       </div>
     </div>
